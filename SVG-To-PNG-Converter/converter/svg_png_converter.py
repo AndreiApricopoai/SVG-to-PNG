@@ -1,7 +1,7 @@
 from converter.converter import Converter
 from converter.svg_deserialization import SvgDeserializedObject
+from converter.svg_utilitary import SvgUtility
 from PIL import Image, ImageDraw, ImageColor
-import re
 
 
 class SvgPngConverter(Converter):
@@ -12,30 +12,6 @@ class SvgPngConverter(Converter):
         self.output_dim = output_dim
         self.image = Image.new("RGBA", self.output_dim, "WHITE")
         self.draw = ImageDraw.Draw(self.image)
-
-    def __extract_attribute_value(self, svg_object: SvgDeserializedObject, attribute_name: str) -> str:
-        for attribute in svg_object.attributes:
-            if attribute.name == attribute_name:
-                return attribute.value
-        return ''
-
-    def __get_float(self, svg_object: SvgDeserializedObject, attribute_name: str, default: float = 0):
-        try:
-            return float(self.__extract_attribute_value(svg_object, attribute_name))
-        except ValueError:
-            return default
-
-    def __get_string(self, svg_object: SvgDeserializedObject, attribute_name: str, default: str = None):
-        value = self.__extract_attribute_value(svg_object, attribute_name)
-        if value == '':
-            return default
-        return value
-
-    def __get_int(self, svg_object: SvgDeserializedObject, attribute_name: str, default: int = 0):
-        try:
-            return int(self.__extract_attribute_value(svg_object, attribute_name))
-        except ValueError:
-            return default
 
     def convert(self):
         for svg_deserialized_object in self.deserialized_objects:
@@ -57,20 +33,21 @@ class SvgPngConverter(Converter):
                 print(f'Unknown tag name: {svg_deserialized_object.tag_name} -> could not draw the element')
         try:
             self.image.save(self.output_file_path)
+            print('Image saved successfully')
         except Exception as e:
             print(f'Could not save the image: {e}')
 
     def __draw_rect(self, rect_object: SvgDeserializedObject):
-        x = self.__get_float(rect_object, 'x', default=0)
-        y = self.__get_float(rect_object, 'y', default=0)
-        width = self.__get_float(rect_object, 'width', default=0)
-        height = self.__get_float(rect_object, 'height', default=0)
+        x = SvgUtility.get_float(rect_object, 'x', default=0)
+        y = SvgUtility.get_float(rect_object, 'y', default=0)
+        width = SvgUtility.get_float(rect_object, 'width', default=0)
+        height = SvgUtility.get_float(rect_object, 'height', default=0)
 
-        stroke = self.__get_string(rect_object, 'stroke', default='black')
-        stroke_width = self.__get_int(rect_object, 'stroke-width', default=1)
-        stroke_opacity = self.__get_float(rect_object, 'stroke-opacity', default=255)
-        fill = self.__get_string(rect_object, 'fill', default='none')
-        fill_opacity = self.__get_float(rect_object, 'fill-opacity', default=255)
+        stroke = SvgUtility.get_string(rect_object, 'stroke', default='black')
+        stroke_width = SvgUtility.get_int(rect_object, 'stroke-width', default=1)
+        stroke_opacity = SvgUtility.get_float(rect_object, 'stroke-opacity', default=255)
+        fill = SvgUtility.get_string(rect_object, 'fill', default='none')
+        fill_opacity = SvgUtility.get_float(rect_object, 'fill-opacity', default=255)
 
         try:
             if stroke_opacity < 255:
@@ -94,15 +71,15 @@ class SvgPngConverter(Converter):
             print(f"Could not draw the rectangle: {e}")
 
     def __draw_circle(self, circle_object: SvgDeserializedObject):
-        cx = self.__get_float(circle_object, 'cx', default=0)
-        cy = self.__get_float(circle_object, 'cy', default=0)
-        r = self.__get_float(circle_object, 'r', default=0)
+        cx = SvgUtility.get_float(circle_object, 'cx', default=0)
+        cy = SvgUtility.get_float(circle_object, 'cy', default=0)
+        r = SvgUtility.get_float(circle_object, 'r', default=0)
 
-        stroke = self.__get_string(circle_object, 'stroke', default='black')
-        stroke_width = self.__get_float(circle_object, 'stroke-width', default=1)
-        stroke_opacity = self.__get_float(circle_object, 'stroke-opacity', default=255)
-        fill = self.__get_string(circle_object, 'fill', default='none')
-        fill_opacity = self.__get_float(circle_object, 'fill-opacity', default=255)
+        stroke = SvgUtility.get_string(circle_object, 'stroke', default='black')
+        stroke_width = SvgUtility.get_float(circle_object, 'stroke-width', default=1)
+        stroke_opacity = SvgUtility.get_float(circle_object, 'stroke-opacity', default=255)
+        fill = SvgUtility.get_string(circle_object, 'fill', default='none')
+        fill_opacity = SvgUtility.get_float(circle_object, 'fill-opacity', default=255)
 
         try:
             if stroke_opacity < 255:
@@ -128,16 +105,16 @@ class SvgPngConverter(Converter):
             print(f"Could not draw the circle: {e}")
 
     def __draw_ellipse(self, ellipse_object: SvgDeserializedObject):
-        cx = self.__get_float(ellipse_object, 'cx', default=0)
-        cy = self.__get_float(ellipse_object, 'cy', default=0)
-        rx = self.__get_float(ellipse_object, 'rx', default=0)
-        ry = self.__get_float(ellipse_object, 'ry', default=0)
+        cx = SvgUtility.get_float(ellipse_object, 'cx', default=0)
+        cy = SvgUtility.get_float(ellipse_object, 'cy', default=0)
+        rx = SvgUtility.get_float(ellipse_object, 'rx', default=0)
+        ry = SvgUtility.get_float(ellipse_object, 'ry', default=0)
 
-        stroke = self.__get_string(ellipse_object, 'stroke', default='black')
-        stroke_width = self.__get_float(ellipse_object, 'stroke-width', default=1)
-        stroke_opacity = self.__get_float(ellipse_object, 'stroke-opacity', default=255)
-        fill = self.__get_string(ellipse_object, 'fill', default='none')
-        fill_opacity = self.__get_float(ellipse_object, 'fill-opacity', default=255)
+        stroke = SvgUtility.get_string(ellipse_object, 'stroke', default='black')
+        stroke_width = SvgUtility.get_float(ellipse_object, 'stroke-width', default=1)
+        stroke_opacity = SvgUtility.get_float(ellipse_object, 'stroke-opacity', default=255)
+        fill = SvgUtility.get_string(ellipse_object, 'fill', default='none')
+        fill_opacity = SvgUtility.get_float(ellipse_object, 'fill-opacity', default=255)
 
         try:
             if stroke_opacity < 255:
@@ -163,14 +140,14 @@ class SvgPngConverter(Converter):
             print(f"Could not draw the ellipse: {e}")
 
     def __draw_line(self, line_object: SvgDeserializedObject):
-        x1 = self.__get_float(line_object, 'x1', default=0)
-        y1 = self.__get_float(line_object, 'y1', default=0)
-        x2 = self.__get_float(line_object, 'x2', default=0)
-        y2 = self.__get_float(line_object, 'y2', default=0)
+        x1 = SvgUtility.get_float(line_object, 'x1', default=0)
+        y1 = SvgUtility.get_float(line_object, 'y1', default=0)
+        x2 = SvgUtility.get_float(line_object, 'x2', default=0)
+        y2 = SvgUtility.get_float(line_object, 'y2', default=0)
 
-        stroke = self.__get_string(line_object, 'stroke', default='black')
-        stroke_width = self.__get_float(line_object, 'stroke-width', default=1)
-        stroke_opacity = self.__get_float(line_object, 'stroke-opacity', default=255)
+        stroke = SvgUtility.get_string(line_object, 'stroke', default='black')
+        stroke_width = SvgUtility.get_float(line_object, 'stroke-width', default=1)
+        stroke_opacity = SvgUtility.get_float(line_object, 'stroke-opacity', default=255)
 
         try:
             if stroke_opacity < 255:
@@ -185,10 +162,10 @@ class SvgPngConverter(Converter):
             print(f"Could not draw the line: {e}")
 
     def __draw_polyline(self, polyline_object: SvgDeserializedObject):
-        points = self.__get_string(polyline_object, 'points', default='')
-        stroke = self.__get_string(polyline_object, 'stroke', default='black')
-        stroke_width = self.__get_float(polyline_object, 'stroke-width', default=1)
-        stroke_opacity = self.__get_float(polyline_object, 'stroke-opacity', default=255)
+        points = SvgUtility.get_string(polyline_object, 'points', default='')
+        stroke = SvgUtility.get_string(polyline_object, 'stroke', default='black')
+        stroke_width = SvgUtility.get_float(polyline_object, 'stroke-width', default=1)
+        stroke_opacity = SvgUtility.get_float(polyline_object, 'stroke-opacity', default=255)
 
         try:
             if stroke_opacity < 255:
@@ -209,9 +186,9 @@ class SvgPngConverter(Converter):
             print(f"Could not draw the polyline: {e}")
 
     def __draw_path(self, path_object: SvgDeserializedObject):
-        path_data = self.__get_string(path_object, 'd', default='')
-        stroke = self.__get_string(path_object, 'stroke', default='black')
-        stroke_width = int(self.__get_float(path_object, 'stroke-width', default=1))
+        path_data = SvgUtility.get_string(path_object, 'd', default='')
+        stroke = SvgUtility.get_string(path_object, 'stroke', default='black')
+        stroke_width = int(SvgUtility.get_float(path_object, 'stroke-width', default=1))
 
         current_x, current_y = 0, 0
 
