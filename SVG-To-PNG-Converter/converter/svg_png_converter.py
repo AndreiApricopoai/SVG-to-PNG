@@ -30,7 +30,6 @@ class SvgPngConverter(Converter):
             return default
         return value
 
-
     def convert(self):
         for svg_deserialized_object in self.deserialized_objects:
             if svg_deserialized_object.tag_name == 'svg':
@@ -55,7 +54,37 @@ class SvgPngConverter(Converter):
             print(f'Could not save the image: {e}')
 
     def __draw_rect(self, rect_object: SvgDeserializedObject):
-        pass
+        x = self.__get_float(rect_object, 'x', default=0)
+        y = self.__get_float(rect_object, 'y', default=0)
+        width = self.__get_float(rect_object, 'width', default=0)
+        height = self.__get_float(rect_object, 'height', default=0)
+
+        stroke = self.__get_string(rect_object, 'stroke', default='black')
+        stroke_width = self.__get_float(rect_object, 'stroke-width', default=1)
+        stroke_opacity = self.__get_float(rect_object, 'stroke-opacity', default=255)
+        fill = self.__get_string(rect_object, 'fill', default='none')
+        fill_opacity = self.__get_float(rect_object, 'fill-opacity', default=255)
+
+        try:
+            if stroke_opacity < 255:
+                color_rgb = ImageColor.getcolor(stroke, "RGB")
+                stroke = color_rgb + (stroke_opacity,)
+
+            if fill_opacity < 255 and fill != 'none':
+                fill_rgb = ImageColor.getcolor(fill, "RGB")
+                fill = fill_rgb + (fill_opacity,)
+            elif fill == 'none':
+                fill = None
+
+            bottom_right_x = x + width
+            bottom_right_y = y + height
+
+            self.draw.rectangle([x, y, bottom_right_x, bottom_right_y], outline=stroke, fill=fill, width=stroke_width)
+
+        except ValueError as ve:
+            print(f"Could not process rectangle attributes: {ve}")
+        except Exception as e:
+            print(f"Could not draw the rectangle: {e}")
 
     def __draw_circle(self, circle_object: SvgDeserializedObject):
         cx = self.__get_float(circle_object, 'cx', default=0)
@@ -69,25 +98,21 @@ class SvgPngConverter(Converter):
         fill_opacity = self.__get_float(circle_object, 'fill-opacity', default=255)
 
         try:
-            # Convert stroke color to RGBA if necessary
             if stroke_opacity < 255:
                 color_rgb = ImageColor.getcolor(stroke, "RGB")
                 stroke = color_rgb + (stroke_opacity,)
 
-            # Convert fill color to RGBA if necessary
             if fill_opacity < 255 and fill != 'none':
                 fill_rgb = ImageColor.getcolor(fill, "RGB")
                 fill = fill_rgb + (fill_opacity,)
             elif fill == 'none':
-                fill = None  # No fill
+                fill = None
 
-            # Calculate bounding box for circle
             left = cx - r
             top = cy - r
             right = cx + r
             bottom = cy + r
 
-            # Draw the circle
             self.draw.ellipse([left, top, right, bottom], outline=stroke, fill=fill, width=stroke_width)
 
         except ValueError as ve:
@@ -96,7 +121,39 @@ class SvgPngConverter(Converter):
             print(f"Could not draw the circle: {e}")
 
     def __draw_ellipse(self, ellipse_object: SvgDeserializedObject):
-        pass
+        cx = self.__get_float(ellipse_object, 'cx', default=0)
+        cy = self.__get_float(ellipse_object, 'cy', default=0)
+        rx = self.__get_float(ellipse_object, 'rx', default=0)
+        ry = self.__get_float(ellipse_object, 'ry', default=0)
+
+        stroke = self.__get_string(ellipse_object, 'stroke', default='black')
+        stroke_width = self.__get_float(ellipse_object, 'stroke-width', default=1)
+        stroke_opacity = self.__get_float(ellipse_object, 'stroke-opacity', default=255)
+        fill = self.__get_string(ellipse_object, 'fill', default='none')
+        fill_opacity = self.__get_float(ellipse_object, 'fill-opacity', default=255)
+
+        try:
+            if stroke_opacity < 255:
+                color_rgb = ImageColor.getcolor(stroke, "RGB")
+                stroke = color_rgb + (stroke_opacity,)
+
+            if fill_opacity < 255 and fill != 'none':
+                fill_rgb = ImageColor.getcolor(fill, "RGB")
+                fill = fill_rgb + (fill_opacity,)
+            elif fill == 'none':
+                fill = None  # No fill
+
+            left = cx - rx
+            top = cy - ry
+            right = cx + rx
+            bottom = cy + ry
+
+            self.draw.ellipse([left, top, right, bottom], outline=stroke, fill=fill, width=stroke_width)
+
+        except ValueError as ve:
+            print(f"Could not process ellipse attributes: {ve}")
+        except Exception as e:
+            print(f"Could not draw the ellipse: {e}")
 
     def __draw_line(self, line_object: SvgDeserializedObject):
         x1 = self.__get_float(line_object, 'x1', default=0)
@@ -113,7 +170,7 @@ class SvgPngConverter(Converter):
                 color_rgb = ImageColor.getcolor(stroke, "RGB")
                 stroke = color_rgb + (stroke_opacity,)
 
-            self.draw.line((x1, y1, x2, y2), fill=stroke, width=stroke_width)
+            self.draw.line([x1, y1, x2, y2], fill=stroke, width=stroke_width)
 
         except ValueError as ve:
             print(f"Could not process stroke attributes: {ve}")
