@@ -1,6 +1,6 @@
 from converter.converter import Converter
 from converter.svg_deserialization import SvgDeserializedObject
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageColor
 
 
 class SvgPngConverter(Converter):
@@ -11,6 +11,12 @@ class SvgPngConverter(Converter):
         self.output_dim = output_dim
         self.image = Image.new("RGBA", self.output_dim, "WHITE")
         self.draw = ImageDraw.Draw(self.image)
+
+    def __extract_attribute_value(self, svg_object: SvgDeserializedObject, attribute_name: str) -> str:
+        for attribute in svg_object.attributes:
+            if attribute.name == attribute_name:
+                return attribute.value
+        return ''
 
     def convert(self):
         for svg_deserialized_object in self.deserialized_objects:
@@ -45,14 +51,23 @@ class SvgPngConverter(Converter):
         pass
 
     def __draw_line(self, line_object: SvgDeserializedObject):
-        # Extract attributes like x1, y1, x2, y2, stroke, and stroke_width from line_object
-        # For demonstration, let's use some default values
-        x1, y1, x2, y2 = 100, 100, 300, 300  # Example coordinates
-        stroke = "black"  # Example stroke color
-        stroke_width = 2  # Example stroke width
+        x1 = float(self.__extract_attribute_value(line_object, 'x1'))
+        y1 = float(self.__extract_attribute_value(line_object, 'y1'))
+        x2 = float(self.__extract_attribute_value(line_object, 'x2'))
+        y2 = float(self.__extract_attribute_value(line_object, 'y2'))
 
-        # Draw the line
-        self.draw.line((x1, y1, x2, y2), fill=stroke, width=stroke_width)
+        stroke = self.__extract_attribute_value(line_object, 'stroke')
+        stroke_width = float(self.__extract_attribute_value(line_object, 'stroke-width'))
+        stroke_opacity = float(self.__extract_attribute_value(line_object, 'stroke-opacity'))
+
+        if stroke_opacity < 255:
+            color_rgb = ImageColor.getcolor(stroke, "RGB")
+            stroke = color_rgb + (stroke_opacity,)
+
+        try:
+            self.draw.line((x1, y1, x2, y2), fill=stroke, width=stroke_width)
+        except Exception as e:
+            print(f"Could not draw the line: {e}")
 
     def __draw_polyline(self, polyline_object: SvgDeserializedObject):
         pass
