@@ -1,6 +1,6 @@
 <svg width="500" height="500" xmlns="http://www.w3.org/2000/svg">
     <!-- Rectangle -->
-    <rect x="10" y="10" width="100" height="50" fill="blue" stroke="black" stroke-width="2"/>
+    <rect x="10" y="10" width="100" height="50" stroke-opacity="" fill="blue" stroke="green" stroke-width="5"/>
 
     <!-- Circle -->
     <circle cx="200" cy="50" r="40" fill="green" stroke="black" stroke-width="3"/>
@@ -12,7 +12,7 @@
     <line x1="10" y1="100" x2="100" y2="150" stroke="red" stroke-width="2"/>
 
     <!-- Path -->
-    <path d="M 150 100 C 200 100, 200 150, 150 150 S 100 150, 100 100" stroke="purple" fill="none" stroke-width="2"/>
+    <path d="M 50 50 L 150 50 L 150 150 L 50 150 L 50 50" stroke="blue" fill="none" stroke-width="3"/>
 
     <!-- Polyline -->
     <polyline points="200,200 250,250 200,300 150,250" stroke="orange" fill="none" stroke-width="2"/>

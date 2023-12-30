@@ -1,6 +1,7 @@
 from converter.converter import Converter
 from converter.svg_deserialization import SvgDeserializedObject
 from PIL import Image, ImageDraw, ImageColor
+import re
 
 
 class SvgPngConverter(Converter):
@@ -29,6 +30,12 @@ class SvgPngConverter(Converter):
         if value == '':
             return default
         return value
+
+    def __get_int(self, svg_object: SvgDeserializedObject, attribute_name: str, default: int = 0):
+        try:
+            return int(self.__extract_attribute_value(svg_object, attribute_name))
+        except ValueError:
+            return default
 
     def convert(self):
         for svg_deserialized_object in self.deserialized_objects:
@@ -60,7 +67,7 @@ class SvgPngConverter(Converter):
         height = self.__get_float(rect_object, 'height', default=0)
 
         stroke = self.__get_string(rect_object, 'stroke', default='black')
-        stroke_width = self.__get_float(rect_object, 'stroke-width', default=1)
+        stroke_width = self.__get_int(rect_object, 'stroke-width', default=1)
         stroke_opacity = self.__get_float(rect_object, 'stroke-opacity', default=255)
         fill = self.__get_string(rect_object, 'fill', default='none')
         fill_opacity = self.__get_float(rect_object, 'fill-opacity', default=255)
@@ -79,7 +86,7 @@ class SvgPngConverter(Converter):
             bottom_right_x = x + width
             bottom_right_y = y + height
 
-            self.draw.rectangle([x, y, bottom_right_x, bottom_right_y], outline=stroke, fill=fill, width=stroke_width)
+            self.draw.rectangle((x, y, bottom_right_x, bottom_right_y), outline=stroke, fill=fill, width=stroke_width)
 
         except ValueError as ve:
             print(f"Could not process rectangle attributes: {ve}")
@@ -178,7 +185,50 @@ class SvgPngConverter(Converter):
             print(f"Could not draw the line: {e}")
 
     def __draw_polyline(self, polyline_object: SvgDeserializedObject):
-        pass
+        points = self.__get_string(polyline_object, 'points', default='')
+        stroke = self.__get_string(polyline_object, 'stroke', default='black')
+        stroke_width = self.__get_float(polyline_object, 'stroke-width', default=1)
+        stroke_opacity = self.__get_float(polyline_object, 'stroke-opacity', default=255)
+
+        try:
+            if stroke_opacity < 255:
+                color_rgb = ImageColor.getcolor(stroke, "RGB")
+                stroke = color_rgb + (stroke_opacity,)
+
+            polyline_points = []
+            for point in points.split():
+                x, y = map(float, point.split(','))
+                polyline_points.append((x, y))
+
+            if polyline_points:
+                self.draw.line(polyline_points, fill=stroke, width=stroke_width, joint='curve')
+
+        except ValueError as ve:
+            print(f"Could not process polyline attributes: {ve}")
+        except Exception as e:
+            print(f"Could not draw the polyline: {e}")
 
     def __draw_path(self, path_object: SvgDeserializedObject):
-        pass
+        path_data = self.__get_string(path_object, 'd', default='')
+        stroke = self.__get_string(path_object, 'stroke', default='black')
+        stroke_width = int(self.__get_float(path_object, 'stroke-width', default=1))
+
+        current_x, current_y = 0, 0
+
+        split_data = path_data.split()
+        command_segments = []
+        for i in range(len(split_data)):
+            if split_data[i] == 'M':
+                command_segments.append(('M', split_data[i + 1], split_data[i + 2]))
+            elif split_data[i] == 'L':
+                command_segments.append(('L', split_data[i + 1], split_data[i + 2]))
+
+        for segment in command_segments:
+            if segment[0] == 'M':
+                current_x = float(segment[1])
+                current_y = float(segment[2])
+            elif segment[0] == 'L':
+                end_x = float(segment[1])
+                end_y = float(segment[2])
+                self.draw.line((current_x, current_y, end_x, end_y), fill=stroke, width=stroke_width)
+                current_x, current_y = end_x, end_y
