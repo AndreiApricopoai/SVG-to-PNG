@@ -45,16 +45,18 @@ class SvgPngConverter(Converter):
 
         stroke = SvgUtility.get_string(rect_object, 'stroke', default='black')
         stroke_width = SvgUtility.get_int(rect_object, 'stroke-width', default=1)
-        stroke_opacity = SvgUtility.get_float(rect_object, 'stroke-opacity', default=255)
+        stroke_opacity = SvgUtility.get_float(rect_object, 'stroke-opacity', default=1)
         fill = SvgUtility.get_string(rect_object, 'fill', default='none')
-        fill_opacity = SvgUtility.get_float(rect_object, 'fill-opacity', default=255)
+        fill_opacity = SvgUtility.get_float(rect_object, 'fill-opacity', default=1)
 
         try:
-            if stroke_opacity < 255:
+            if 0 <= stroke_opacity <= 1:
+                stroke_opacity = int(stroke_opacity * 255)
                 color_rgb = ImageColor.getcolor(stroke, "RGB")
                 stroke = color_rgb + (stroke_opacity,)
 
-            if fill_opacity < 255 and fill != 'none':
+            if 0 <= fill_opacity <= 1 and fill != 'none':
+                fill_opacity = int(fill_opacity * 255)
                 fill_rgb = ImageColor.getcolor(fill, "RGB")
                 fill = fill_rgb + (fill_opacity,)
             elif fill == 'none':
@@ -76,26 +78,28 @@ class SvgPngConverter(Converter):
         r = SvgUtility.get_float(circle_object, 'r', default=0)
 
         stroke = SvgUtility.get_string(circle_object, 'stroke', default='black')
-        stroke_width = SvgUtility.get_float(circle_object, 'stroke-width', default=1)
-        stroke_opacity = SvgUtility.get_float(circle_object, 'stroke-opacity', default=255)
+        stroke_width = SvgUtility.get_int(circle_object, 'stroke-width', default=1)
+        stroke_opacity = SvgUtility.get_float(circle_object, 'stroke-opacity', default=1)
         fill = SvgUtility.get_string(circle_object, 'fill', default='none')
-        fill_opacity = SvgUtility.get_float(circle_object, 'fill-opacity', default=255)
+        fill_opacity = SvgUtility.get_float(circle_object, 'fill-opacity', default=1)
+
+        left = cx - r
+        top = cy - r
+        right = cx + r
+        bottom = cy + r
 
         try:
-            if stroke_opacity < 255:
+            if 0 <= stroke_opacity <= 1:
+                stroke_opacity = int(stroke_opacity * 255)
                 color_rgb = ImageColor.getcolor(stroke, "RGB")
                 stroke = color_rgb + (stroke_opacity,)
 
-            if fill_opacity < 255 and fill != 'none':
+            if 0 <= fill_opacity <= 1 and fill != 'none':
+                fill_opacity = int(fill_opacity * 255)
                 fill_rgb = ImageColor.getcolor(fill, "RGB")
                 fill = fill_rgb + (fill_opacity,)
             elif fill == 'none':
                 fill = None
-
-            left = cx - r
-            top = cy - r
-            right = cx + r
-            bottom = cy + r
 
             self.draw.ellipse([left, top, right, bottom], outline=stroke, fill=fill, width=stroke_width)
 
@@ -111,26 +115,28 @@ class SvgPngConverter(Converter):
         ry = SvgUtility.get_float(ellipse_object, 'ry', default=0)
 
         stroke = SvgUtility.get_string(ellipse_object, 'stroke', default='black')
-        stroke_width = SvgUtility.get_float(ellipse_object, 'stroke-width', default=1)
-        stroke_opacity = SvgUtility.get_float(ellipse_object, 'stroke-opacity', default=255)
+        stroke_width = SvgUtility.get_int(ellipse_object, 'stroke-width', default=1)
+        stroke_opacity = SvgUtility.get_float(ellipse_object, 'stroke-opacity', default=1)
         fill = SvgUtility.get_string(ellipse_object, 'fill', default='none')
-        fill_opacity = SvgUtility.get_float(ellipse_object, 'fill-opacity', default=255)
+        fill_opacity = SvgUtility.get_float(ellipse_object, 'fill-opacity', default=1)
+
+        left = cx - rx
+        top = cy - ry
+        right = cx + rx
+        bottom = cy + ry
 
         try:
-            if stroke_opacity < 255:
+            if 0 <= stroke_opacity <= 1:
+                stroke_opacity = int(stroke_opacity * 255)
                 color_rgb = ImageColor.getcolor(stroke, "RGB")
                 stroke = color_rgb + (stroke_opacity,)
 
-            if fill_opacity < 255 and fill != 'none':
+            if 0 <= fill_opacity <= 1 and fill != 'none':
+                fill_opacity = int(fill_opacity * 255)
                 fill_rgb = ImageColor.getcolor(fill, "RGB")
                 fill = fill_rgb + (fill_opacity,)
             elif fill == 'none':
-                fill = None  # No fill
-
-            left = cx - rx
-            top = cy - ry
-            right = cx + rx
-            bottom = cy + ry
+                fill = None
 
             self.draw.ellipse([left, top, right, bottom], outline=stroke, fill=fill, width=stroke_width)
 
@@ -146,11 +152,12 @@ class SvgPngConverter(Converter):
         y2 = SvgUtility.get_float(line_object, 'y2', default=0)
 
         stroke = SvgUtility.get_string(line_object, 'stroke', default='black')
-        stroke_width = SvgUtility.get_float(line_object, 'stroke-width', default=1)
-        stroke_opacity = SvgUtility.get_float(line_object, 'stroke-opacity', default=255)
+        stroke_width = SvgUtility.get_int(line_object, 'stroke-width', default=1)
+        stroke_opacity = SvgUtility.get_float(line_object, 'stroke-opacity', default=1)
 
         try:
-            if stroke_opacity < 255:
+            if 0 <= stroke_opacity <= 1:
+                stroke_opacity = int(stroke_opacity * 255)
                 color_rgb = ImageColor.getcolor(stroke, "RGB")
                 stroke = color_rgb + (stroke_opacity,)
 
@@ -164,11 +171,12 @@ class SvgPngConverter(Converter):
     def __draw_polyline(self, polyline_object: SvgDeserializedObject):
         points = SvgUtility.get_string(polyline_object, 'points', default='')
         stroke = SvgUtility.get_string(polyline_object, 'stroke', default='black')
-        stroke_width = SvgUtility.get_float(polyline_object, 'stroke-width', default=1)
-        stroke_opacity = SvgUtility.get_float(polyline_object, 'stroke-opacity', default=255)
+        stroke_width = SvgUtility.get_int(polyline_object, 'stroke-width', default=1)
+        stroke_opacity = SvgUtility.get_float(polyline_object, 'stroke-opacity', default=1)
 
         try:
-            if stroke_opacity < 255:
+            if 0 <= stroke_opacity <= 1:
+                stroke_opacity = int(stroke_opacity * 255)
                 color_rgb = ImageColor.getcolor(stroke, "RGB")
                 stroke = color_rgb + (stroke_opacity,)
 
@@ -188,7 +196,16 @@ class SvgPngConverter(Converter):
     def __draw_path(self, path_object: SvgDeserializedObject):
         path_data = SvgUtility.get_string(path_object, 'd', default='')
         stroke = SvgUtility.get_string(path_object, 'stroke', default='black')
-        stroke_width = int(SvgUtility.get_float(path_object, 'stroke-width', default=1))
+        stroke_width = SvgUtility.get_int(path_object, 'stroke-width', default=1)
+        stroke_opacity = SvgUtility.get_float(path_object, 'stroke-opacity', default=1)
+
+        try:
+            if 0 <= stroke_opacity <= 1:
+                stroke_opacity = int(stroke_opacity * 255)
+                color_rgb = ImageColor.getcolor(stroke, "RGB")
+                stroke = color_rgb + (stroke_opacity,)
+        except ValueError as ve:
+            print(f"Could not process stroke attributes: {ve}")
 
         current_x, current_y = 0, 0
 
@@ -199,13 +216,17 @@ class SvgPngConverter(Converter):
                 command_segments.append(('M', split_data[i + 1], split_data[i + 2]))
             elif split_data[i] == 'L':
                 command_segments.append(('L', split_data[i + 1], split_data[i + 2]))
-
-        for segment in command_segments:
-            if segment[0] == 'M':
-                current_x = float(segment[1])
-                current_y = float(segment[2])
-            elif segment[0] == 'L':
-                end_x = float(segment[1])
-                end_y = float(segment[2])
-                self.draw.line((current_x, current_y, end_x, end_y), fill=stroke, width=stroke_width)
-                current_x, current_y = end_x, end_y
+        try:
+            for segment in command_segments:
+                if segment[0] == 'M':
+                    current_x = float(segment[1])
+                    current_y = float(segment[2])
+                elif segment[0] == 'L':
+                    end_x = float(segment[1])
+                    end_y = float(segment[2])
+                    self.draw.line((current_x, current_y, end_x, end_y), fill=stroke, width=stroke_width)
+                    current_x, current_y = end_x, end_y
+        except ValueError as ve:
+            print(f"Could not process path attributes: {ve}")
+        except Exception as e:
+            print(f"Could not draw the path: {e}")
