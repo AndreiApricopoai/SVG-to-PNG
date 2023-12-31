@@ -1,4 +1,5 @@
 from converter.svg_deserialization import SvgDeserializedObject
+from PIL import ImageColor
 
 
 class SvgUtility:
@@ -29,3 +30,17 @@ class SvgUtility:
             return int(SvgUtility.__extract_attribute_value(svg_object, attribute_name))
         except ValueError:
             return default
+
+    @staticmethod
+    def process_color_and_opacity(obj: SvgDeserializedObject, attribute_name, default_color=None,
+                                    default_opacity=1):
+        color = SvgUtility.get_string(obj, attribute_name, default=default_color)
+        opacity = SvgUtility.get_float(obj, f'{attribute_name}-opacity', default=default_opacity)
+        try:
+            if 0 <= opacity <= 1:
+                opacity = int(opacity * 255)
+                color_rgb = ImageColor.getcolor(color, "RGB")
+                return color_rgb + (opacity,)
+            return None
+        except ValueError as ve:
+            print(f"Could not process {attribute_name} attributes: {ve}")
