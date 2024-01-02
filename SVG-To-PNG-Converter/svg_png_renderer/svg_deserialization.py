@@ -1,6 +1,6 @@
 import os
 import xml.etree.ElementTree as ET
-from converter.deserialization import Deserializer, DeserializedObject
+from .deserialization import Deserializer, DeserializedObject
 
 
 class Attribute:

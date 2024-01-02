@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from converter.deserialization import DeserializedObject
+from .deserialization import DeserializedObject
 
 
 class Converter(ABC):

@@ -1,6 +1,6 @@
-from converter.converter import Converter
-from converter.svg_deserialization import SvgDeserializedObject
-from converter.svg_utilitary import SvgUtility
+from .converter import Converter
+from .svg_deserialization import SvgDeserializedObject
+from .svg_utilitary import SvgUtility
 from PIL import Image, ImageDraw, ImageColor
 
 

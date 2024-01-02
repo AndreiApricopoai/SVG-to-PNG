@@ -1,4 +1,4 @@
-from converter.svg_deserialization import SvgDeserializedObject
+from .svg_deserialization import SvgDeserializedObject
 from PIL import ImageColor
 
 
