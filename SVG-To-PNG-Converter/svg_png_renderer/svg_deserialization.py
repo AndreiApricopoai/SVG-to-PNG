@@ -6,6 +6,7 @@ from .deserialization import Deserializer, DeserializedObject
 class Attribute:
     """
     Represents an attribute of an SVG element.
+
     Attributes:
         name (str): The name of the attribute.
         value (str): The value of the attribute.
@@ -13,6 +14,7 @@ class Attribute:
     def __init__(self, name: str, value: str):
         """
         Initializes the Attribute with the name and value.
+
         Params:
             name (str): The name of the attribute.
             value (str): The value of the attribute.
@@ -30,6 +32,7 @@ class Attribute:
 class SvgDeserializedObject(DeserializedObject):
     """
     A class that represents a deserialized SVG object.
+
     Attributes:
         tag_name (str): The tag name of the SVG element.
         attributes (list[Attribute]): A list of attributes of the SVG element.
@@ -50,6 +53,7 @@ class SvgDeserializedObject(DeserializedObject):
         """
         Adds an attribute to the list of attributes of the SvgDeserializedObject.
         If an attribute with the same name already exists, it will be replaced.
+
         Params:
             attribute (Attribute): The attribute to be added.
         """
@@ -73,12 +77,14 @@ class SvgDeserializedObject(DeserializedObject):
 class SvgDeserializer(Deserializer):
     """
     A class that represents an SVG deserializer.
+
     Attributes:
         file_path (str): The path to the svg file that needs to be deserialized.
     """
     def __init__(self, file_path: str):
         """
         Initializes the SvgDeserializer with the path of the svg file that needs to be deserialized.
+
         Params:
             file_path (str): The path to the svg file that needs to be deserialized.
         """
@@ -88,6 +94,7 @@ class SvgDeserializer(Deserializer):
         """
         Deserializes the svg file into a list of SvgDeserializedObjects.
         Iterates over the xml tree and creates a SvgDeserializedObject for each element.
+
         Returns:
             list[SvgDeserializedObject]: A list of SvgDeserializedObjects that represent the svg file.
         """
@@ -114,6 +121,7 @@ class SvgDeserializer(Deserializer):
     def __is_valid_svg(self):
         """
         Checks if the file is a valid SVG file.
+
         Returns:
             bool: True if the file is a valid SVG file, False otherwise.
         """

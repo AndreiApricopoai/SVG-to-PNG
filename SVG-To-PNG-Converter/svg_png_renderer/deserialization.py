@@ -41,7 +41,6 @@ class Deserializer(ABC):
     def deserialize(self) -> list[DeserializedObject]:
         """
         Abstract method to be implemented by subclasses for deserialization.
-
         This method should contain the logic to deserialize the file into a list of deserialized objects.
 
         Returns:

@@ -14,7 +14,6 @@ class Converter(ABC):
         that represent the file to be converted.
         output_file_path (str): The path to the file where the converted output will be saved.
     """
-
     def __init__(
             self,
             deserialized_objects: list[DeserializedObject],
