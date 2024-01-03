@@ -5,12 +5,31 @@ from PIL import Image, ImageDraw, ImageColor
 
 
 class SvgPngConverter(Converter):
+    """
+    A class that converts deserialized SVG objects into PNG images.
+    It makes use of the Pillow library to draw the SVG objects onto an image.
+
+    Attributes:
+        deserialized_objects (list[SvgDeserializedObject]): A list of SvgDeserializedObjects
+        that represent the SVG file to be converted.
+        output_dim (tuple[int, int]): The dimensions of the output image.
+        output_file_path (str): The path to the file where the converted output will be saved.
+    """
     def __init__(
             self,
             svg_deserialized_objects: list[SvgDeserializedObject],
             output_dim: tuple[int, int]=(500, 500),
             output_file_path: str = 'output.png'
     ):
+        """
+        Initializes the SvgPngConverter with  SvgDeserializedObjects, output dimensions and an output file path.
+
+        Params:
+            svg_deserialized_objects (list[SvgDeserializedObject]): A list of SvgDeserializedObjects
+            that represent the SVG file to be converted.
+            output_dim (tuple[int, int]): The dimensions of the output image.
+            output_file_path (str): The path to the file where the converted output will be saved.
+        """
         super().__init__(svg_deserialized_objects, output_file_path)
         self.deserialized_objects: list[SvgDeserializedObject] = svg_deserialized_objects
         self.output_dim = output_dim
@@ -18,6 +37,9 @@ class SvgPngConverter(Converter):
         self.draw = ImageDraw.Draw(self.image)
 
     def convert(self):
+        """
+        Converts the deserialized SVG objects into a PNG image and saves it to the specified output file path.
+        """
         for svg_deserialized_object in self.deserialized_objects:
             if svg_deserialized_object.tag_name == 'svg':
                 print('Drawing svg...')
@@ -42,6 +64,13 @@ class SvgPngConverter(Converter):
             print(f'Could not save the image: {e}')
 
     def __draw_rect(self, rect_object: SvgDeserializedObject):
+        """
+        Draws a rectangle on the image using the attributes of the SvgDeserializedObject.
+
+        Params:
+            rect_object (SvgDeserializedObject): The object from which the attributes will be extracted
+            in order to draw the rectangle.
+        """
         x = SvgUtility.get_float(rect_object, 'x', default=0)
         y = SvgUtility.get_float(rect_object, 'y', default=0)
         width = SvgUtility.get_float(rect_object, 'width', default=0)
@@ -69,6 +98,13 @@ class SvgPngConverter(Converter):
             print(f"Could not draw the rectangle: {e}")
 
     def __draw_circle(self, circle_object: SvgDeserializedObject):
+        """
+        Draws a circle on the image using the attributes of the SvgDeserializedObject.
+
+        Params:
+            circle_object (SvgDeserializedObject): The object from which the attributes will be extracted
+            in order to draw the circle.
+        """
         cx = SvgUtility.get_float(circle_object, 'cx', default=0)
         cy = SvgUtility.get_float(circle_object, 'cy', default=0)
         r = SvgUtility.get_float(circle_object, 'r', default=0)
@@ -97,6 +133,13 @@ class SvgPngConverter(Converter):
             print(f"Could not draw the circle: {e}")
 
     def __draw_ellipse(self, ellipse_object: SvgDeserializedObject):
+        """
+        Draws an ellipse on the image using the attributes of the SvgDeserializedObject.
+
+        Params:
+            ellipse_object (SvgDeserializedObject): The object from which the attributes will be extracted
+            in order to draw the ellipse.
+        """
         cx = SvgUtility.get_float(ellipse_object, 'cx', default=0)
         cy = SvgUtility.get_float(ellipse_object, 'cy', default=0)
         rx = SvgUtility.get_float(ellipse_object, 'rx', default=0)
@@ -126,6 +169,13 @@ class SvgPngConverter(Converter):
             print(f"Could not draw the ellipse: {e}")
 
     def __draw_line(self, line_object: SvgDeserializedObject):
+        """
+        Draws a line on the image using the attributes of the SvgDeserializedObject.
+
+        Params:
+            line_object (SvgDeserializedObject): The object from which the attributes will be extracted
+            in order to draw the line.
+        """
         x1 = SvgUtility.get_float(line_object, 'x1', default=0)
         y1 = SvgUtility.get_float(line_object, 'y1', default=0)
         x2 = SvgUtility.get_float(line_object, 'x2', default=0)
@@ -143,6 +193,13 @@ class SvgPngConverter(Converter):
             print(f"Could not draw the line: {e}")
 
     def __draw_polyline(self, polyline_object: SvgDeserializedObject):
+        """
+        Draws a polyline on the image using the attributes of the SvgDeserializedObject.
+
+        Params:
+            polyline_object (SvgDeserializedObject): The object from which the attributes will be extracted
+            in order to draw the polyline.
+        """
         points = SvgUtility.get_string(polyline_object, 'points', default='')
         stroke_width = SvgUtility.get_int(polyline_object, 'stroke-width', default=1)
         stroke = SvgUtility.process_color_and_opacity(polyline_object, 'stroke')
@@ -164,6 +221,17 @@ class SvgPngConverter(Converter):
             print(f"Could not draw the polyline: {e}")
 
     def __draw_path(self, path_object: SvgDeserializedObject):
+        """
+        Draws a path on the image using the attributes of the SvgDeserializedObject.
+
+        Params:
+            path_object (SvgDeserializedObject): The object from which the attributes will be extracted
+            in order to draw the path.
+
+        Support:
+            Currently only supports the M and L commands as the other commands
+            cannot be drawn using the Pillow library.
+        """
         path_data = SvgUtility.get_string(path_object, 'd', default='')
         stroke_width = SvgUtility.get_int(path_object, 'stroke-width', default=1)
         stroke = SvgUtility.process_color_and_opacity(path_object, 'stroke')
