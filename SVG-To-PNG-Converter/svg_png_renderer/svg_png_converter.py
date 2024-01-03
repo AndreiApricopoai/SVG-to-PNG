@@ -5,8 +5,12 @@ from PIL import Image, ImageDraw, ImageColor
 
 
 class SvgPngConverter(Converter):
-    def __init__(self, svg_deserialized_objects: list[SvgDeserializedObject], output_dim: tuple[int, int] = (500, 500),
-                 output_file_path: str = 'output.png'):
+    def __init__(
+            self,
+            svg_deserialized_objects: list[SvgDeserializedObject],
+            output_dim: tuple[int, int]=(500, 500),
+            output_file_path: str = 'output.png'
+    ):
         super().__init__(svg_deserialized_objects, output_file_path)
         self.deserialized_objects: list[SvgDeserializedObject] = svg_deserialized_objects
         self.output_dim = output_dim
@@ -30,7 +34,7 @@ class SvgPngConverter(Converter):
             elif svg_deserialized_object.tag_name == 'path':
                 self.__draw_path(svg_deserialized_object)
             else:
-                print(f'Unknown tag name: {svg_deserialized_object.tag_name} -> could not draw the element')
+                print(f'Unknown tag name: {svg_deserialized_object.tag_name}')
         try:
             self.image.save(self.output_file_path)
             print('Image saved successfully')
@@ -45,13 +49,22 @@ class SvgPngConverter(Converter):
         stroke_width = SvgUtility.get_int(rect_object, 'stroke-width', default=1)
 
         stroke = SvgUtility.process_color_and_opacity(rect_object, 'stroke')
-        fill = SvgUtility.process_color_and_opacity(rect_object, 'fill', default_color='none')
+        fill = SvgUtility.process_color_and_opacity(
+            rect_object,
+            'fill',
+            default_color='none'
+        )
 
         bottom_right_x = x + width
         bottom_right_y = y + height
 
         try:
-            self.draw.rectangle((x, y, bottom_right_x, bottom_right_y), outline=stroke, fill=fill, width=stroke_width)
+            self.draw.rectangle(
+                (x, y, bottom_right_x, bottom_right_y),
+                outline=stroke,
+                fill=fill,
+                width=stroke_width
+            )
         except Exception as e:
             print(f"Could not draw the rectangle: {e}")
 
@@ -62,7 +75,11 @@ class SvgPngConverter(Converter):
         stroke_width = SvgUtility.get_int(circle_object, 'stroke-width', default=1)
 
         stroke = SvgUtility.process_color_and_opacity(circle_object, 'stroke')
-        fill = SvgUtility.process_color_and_opacity(circle_object, 'fill', default_color='none')
+        fill = SvgUtility.process_color_and_opacity(
+            circle_object,
+            'fill',
+            default_color='none'
+        )
 
         left = cx - r
         top = cy - r
@@ -70,7 +87,12 @@ class SvgPngConverter(Converter):
         bottom = cy + r
 
         try:
-            self.draw.ellipse([left, top, right, bottom], outline=stroke, fill=fill, width=stroke_width)
+            self.draw.ellipse(
+                [left, top, right, bottom],
+                outline=stroke,
+                fill=fill,
+                width=stroke_width
+            )
         except Exception as e:
             print(f"Could not draw the circle: {e}")
 
@@ -82,7 +104,11 @@ class SvgPngConverter(Converter):
         stroke_width = SvgUtility.get_int(ellipse_object, 'stroke-width', default=1)
 
         stroke = SvgUtility.process_color_and_opacity(ellipse_object, 'stroke')
-        fill = SvgUtility.process_color_and_opacity(ellipse_object, 'fill', default_color='none')
+        fill = SvgUtility.process_color_and_opacity(
+            ellipse_object,
+            'fill',
+            default_color='none'
+        )
 
         left = cx - rx
         top = cy - ry
@@ -90,7 +116,12 @@ class SvgPngConverter(Converter):
         bottom = cy + ry
 
         try:
-            self.draw.ellipse([left, top, right, bottom], outline=stroke, fill=fill, width=stroke_width)
+            self.draw.ellipse(
+                [left, top, right, bottom],
+                outline=stroke,
+                fill=fill,
+                width=stroke_width
+            )
         except Exception as e:
             print(f"Could not draw the ellipse: {e}")
 
@@ -103,7 +134,11 @@ class SvgPngConverter(Converter):
         stroke = SvgUtility.process_color_and_opacity(line_object, 'stroke')
 
         try:
-            self.draw.line([x1, y1, x2, y2], fill=stroke, width=stroke_width)
+            self.draw.line(
+                [x1, y1, x2, y2],
+                fill=stroke,
+                width=stroke_width
+            )
         except Exception as e:
             print(f"Could not draw the line: {e}")
 
@@ -119,7 +154,12 @@ class SvgPngConverter(Converter):
                 polyline_points.append((x, y))
 
             if polyline_points:
-                self.draw.line(polyline_points, fill=stroke, width=stroke_width, joint='curve')
+                self.draw.line(
+                    polyline_points,
+                    fill=stroke,
+                    width=stroke_width,
+                    joint='curve'
+                )
         except Exception as e:
             print(f"Could not draw the polyline: {e}")
 
@@ -145,7 +185,11 @@ class SvgPngConverter(Converter):
                 elif segment[0] == 'L':
                     end_x = float(segment[1])
                     end_y = float(segment[2])
-                    self.draw.line((current_x, current_y, end_x, end_y), fill=stroke, width=stroke_width)
+                    self.draw.line(
+                        (current_x, current_y, end_x, end_y),
+                        fill=stroke,
+                        width=stroke_width
+                    )
                     current_x, current_y = end_x, end_y
         except ValueError as ve:
             print(f"Could not process path attributes: {ve}")
